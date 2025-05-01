@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roommate Schedule</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(to right, black, #1e3a8a, black);
+      color: white;
+      padding: 2rem;
+    }
+    h1, h2 {
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+    thead th {
+      background-color: #1e3a8a;
+      color: white;
+    }
+    tbody td {
+      background-color: #374151;
+      color: #d1d5db;
+      cursor: pointer;
+    }
+    tbody td.booked {
+      background-color: #2563eb;
+      color: white;
+    }
+    tbody td:hover {
+      background-color: #1d4ed8;
+    }
+    .footer, .header {
+      text-align: center;
+      padding: 1rem;
+      background-color: rgba(255,255,255,0.05);
+      margin-top: 2rem;
+      border-radius: 0.5rem;
+    }
+    .slot-table th {
+      background-color: #1e3a8a;
+    }
+    .slot-table td {
+      color: #111827;
+    }
+    .slot-table tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+    .slot-table tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Roommate Schedule</h1>
+  </div>
+
+  <div class="schedule">
+    <table id="scheduleTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Mon</th>
+          <th>Tue</th>
+          <th>Wed</th>
+          <th>Thu</th>
+          <th>Fri</th>
+          <th>Sat</th>
+          <th>Sun</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody">
+        <!-- Rows will be inserted by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <section>
+    <h2>Occupied Slots</h2>
+    <div class="occupied">
+      <table class="slot-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Space</th>
+            <th>Booked By</th>
+          </tr>
+        </thead>
+        <tbody id="occupiedSlots">
+          <!-- Booked rows will be inserted by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    <p>&copy; 2025 RoomHub</p>
+  </div>
+
+  <script>
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const hours = [
+      '9-10 AM', '10-11 AM', '11-12 PM', '12-1 PM', '1-2 PM',
+      '2-3 PM', '3-4 PM', '4-5 PM', '5-6 PM', '6-7 PM',
+      '7-8 PM', '8-9 PM'
+    ];
+    const defaultSpace = 'Kitchen';
+    const defaultPerson = 'ROOMMATE 1';
+
+    let bookedSlots = [
+      { day: 'Mon', hour: '9-10 AM', space: 'Kitchen', person: 'ROOMMATE 2' },
+      { day: 'Wed', hour: '2-3 PM', space: 'Living Room', person: 'ROOMMATE 1' },
+      { day: 'Fri', hour: '5-6 PM', space: 'Laundry', person: 'ROOMMATE 2' },
+    ];
+
+    const scheduleBody = document.getElementById('scheduleBody');
+    const occupiedTable = document.getElementById('occupiedSlots');
+
+    function renderSchedule() {
+      scheduleBody.innerHTML = '';
+      hours.forEach(hour => {
+        const row = document.createElement('tr');
+        const hourCell = document.createElement('td');
+        hourCell.textContent = hour;
+        row.appendChild(hourCell);
+
+        days.forEach(day => {
+          const cell = document.createElement('td');
+          const isBooked = bookedSlots.some(s => s.day === day && s.hour === hour);
+          if (isBooked) cell.classList.add('booked');
+          cell.textContent = isBooked ? 'Booked' : '—';
+          cell.addEventListener('click', () => toggleBooking(day, hour));
+          row.appendChild(cell);
+        });
+
+        scheduleBody.appendChild(row);
+      });
+    }
+
+    function renderOccupied() {
+      occupiedTable.innerHTML = '';
+      bookedSlots.forEach(slot => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${slot.day}</td>
+          <td>${slot.hour}</td>
+          <td>${slot.space}</td>
+          <td>${slot.person}</td>
+        `;
+        occupiedTable.appendChild(row);
+      });
+    }
+
+    function toggleBooking(day, hour) {
+      const index = bookedSlots.findIndex(s => s.day === day && s.hour === hour);
+      if (index !== -1) {
+        bookedSlots.splice(index, 1);
+      } else {
+        bookedSlots.push({ day, hour, space: defaultSpace, person: defaultPerson });
+      }
+      renderSchedule();
+      renderOccupied();
+    }
+
+    renderSchedule();
+    renderOccupied();
+  </script>
+</body>
+</html>
 
