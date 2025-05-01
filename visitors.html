@@ -1,1 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guest List</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(to right, black, #1e3a8a, black);
+      color: white;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      background-color: black;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav a {
+      color: white;
+      margin-left: 1.5rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      color: #60a5fa;
+    }
+    .logo {
+      font-size: 1.5rem;
+      color: #3b82f6;
+      font-weight: 800;
+    }
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: white;
+      color: black;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .form-control, select, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    .visitor {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      color: black;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .badge {
+      background-color: #dbeafe;
+      color: #1e3a8a;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+    }
+    footer {
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
 
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">RoomHub</div>
+    <div>
+      <a href="index.html">Dashboard</a>
+      <a href="guests.html">Guests</a>
+      <a href="reminders.html">Reminders</a>
+      <a href="schedule.html">Schedule</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1 class="text-center">Guest List</h1>
+
+    <div class="card">
+      <h2>Add a Guest</h2>
+      <form id="guestForm">
+        <input class="form-control" type="text" id="name" placeholder="Guest Name" required />
+        <select class="form-control" id="time" required>
+          <option value="">Select Time</option>
+        </select>
+        <label>
+          <input type="checkbox" id="overnight" />
+          Overnight Stay
+        </label>
+        <select class="form-control" id="assignedTo" required>
+          <option value="">Assign To</option>
+          <option value="ROOMMATE 1">ROOMMATE 1</option>
+          <option value="ROOMMATE 2">ROOMMATE 2</option>
+        </select>
+        <button type="submit" class="form-control" style="background-color:#1e3a8a;color:white;">Add Guest</button>
+      </form>
+    </div>
+
+    <h2>Visitors</h2>
+    <div id="visitorList"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 <strong>RoomHub</strong> | Created by <strong>Viyata</strong>
+  </footer>
+
+  <script>
+    const visitors = [
+      { id: 1, name: 'Belly Conklin', time: '2-3 PM', age: 17, overnight: false, assignedTo: 'ROOMMATE 1' },
+      { id: 2, name: 'Jeremiah Fisher', time: '5-6 PM', age: 18, overnight: true, assignedTo: 'ROOMMATE 2' },
+      { id: 3, name: 'Conrad Fisher', time: '7-9 PM', age: 19, overnight: false, assignedTo: 'ROOMMATE 1' },
+      { id: 4, name: 'Steven Conklin', time: '6-8 PM', age: 20, overnight: true, assignedTo: 'ROOMMATE 2' },
+    ];
+
+    const timeOptions = [
+      '9-10 AM', '10-11 AM', '11-12 PM', '12-1 PM', '1-2 PM',
+      '2-3 PM', '3-4 PM', '4-5 PM', '5-6 PM', '6-7 PM',
+      '7-8 PM', '8-9 PM', '9-10 PM'
+    ];
+
+    const timeSelect = document.getElementById('time');
+    const visitorList = document.getElementById('visitorList');
+    const form = document.getElementById('guestForm');
+
+    timeOptions.forEach(time => {
+      const option = document.createElement('option');
+      option.value = time;
+      option.textContent = time;
+      timeSelect.appendChild(option);
+    });
+
+    function renderVisitors() {
+      visitorList.innerHTML = '';
+      visitors.forEach(guest => {
+        const div = document.createElement('div');
+        div.className = 'visitor';
+        div.innerHTML = `
+          <div>
+            <p><strong>${guest.name}</strong> (Age: ${guest.age ?? 'N/A'})</p>
+            <p>Hosted by: ${guest.assignedTo}</p>
+            <p>${guest.overnight ? 'Overnight Stay' : 'No Overnight'}</p>
+          </div>
+          <span class="badge">${guest.time}</span>
+        `;
+        visitorList.appendChild(div);
+      });
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const time = document.getElementById('time').value;
+      const overnight = document.getElementById('overnight').checked;
+      const assignedTo = document.getElementById('assignedTo').value;
+
+      if (name && time && assignedTo) {
+        const newGuest = {
+          id: visitors.length + 1,
+          name,
+          time,
+          overnight,
+          assignedTo,
+          age: Math.floor(Math.random() * 10) + 18
+        };
+        visitors.push(newGuest);
+        renderVisitors();
+        form.reset();
+      }
+    });
+
+    renderVisitors();
+  </script>
+</body>
+</html>
